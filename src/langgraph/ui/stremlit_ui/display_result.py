@@ -35,3 +35,27 @@ class DisplayResultStreamlit:
                         if isinstance(last_msg, AIMessage):
                             with st.chat_message("assistant"):
                                 st.write(last_msg.content)
+
+        elif usecase.lower().startswith("chatbot with web"):
+            # ✅ Correct input format for LangGraph
+            input_state = {"messages": [HumanMessage(content=user_message)]}
+
+            with st.chat_message("user"):
+                st.write(user_message)
+
+            # ✅ Stream LangGraph responses safely
+            for event in graph.stream(input_state):
+                for value in event.values():
+                    if "messages" in value:
+                        messages = value["messages"]
+
+                        # Handle both list or single message
+                        if isinstance(messages, list):
+                            last_msg = messages[-1]
+                        else:
+                            last_msg = messages
+
+                        # Only show if it's an AIMessage
+                        if isinstance(last_msg, AIMessage):
+                            with st.chat_message("assistant"):
+                                st.write(last_msg.content)
